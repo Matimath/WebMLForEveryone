@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload file</title>
+</head>
+<body>
+    <header><h2>Upload file - simple interface</h2></header>
+    <main>
+        <!-- List of all uploaded files -->
+        <div id="uploaded-files-list">
+            <h3><i>Uploaded files</i></h3>
+            {% if docs %}
+                <ul>
+                    {% for doc in docs %}
+                        <li>
+                            <a href="{{ doc.docfile.url }}">{{ doc.docfile.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Nothing uploaded yet...</p>
+            {% endif %}
+        </div>
+
+        <!-- Upload file form -->
+        <div id="upload-file">
+            <h3><i>Upload file</i></h3>
+            <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Form errors (if the are any) -->
+                <p>{{ form.non_field_errors }}</p>
+
+                <!-- Form label -->
+                <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+
+                <!-- File selector -->
+                <p>
+                    {{ form.docfile.errors }}
+                    {{ form.docfile }}
+                </p>
+
+                <!-- Upload button -->
+                <p><input type="submit" value="Upload"/></p>
+            </form>
+        </div>
+    </main>
+    <footer style="font-size:small;">Created by Bartłomiej Bancerek&reg; (haha!)</footer>
+</body>
+</html>
