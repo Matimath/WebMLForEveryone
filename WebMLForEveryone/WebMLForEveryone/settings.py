@@ -78,7 +78,10 @@ WSGI_APPLICATION = 'WebMLForEveryone.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': 'database',	#os.path.join(BASE_DIR, 'db.sqlite3'),
+	'PASSWORD': 'mimuw',
+	'HOST': 'localhost',
+	'PORT': '',
     }
 }
 
