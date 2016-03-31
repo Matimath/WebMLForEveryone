@@ -15,7 +15,7 @@ def upload(request):
             doc = Document(docfile=request.FILES['docfile'])
             doc.save()
             # Reload page after POST
-            return HttpResponseRedirect(reverse('upload'))
+            return HttpResponseRedirect(reverse('choose'))
     else:
         form = UploadDocumentForm()
 
@@ -23,7 +23,16 @@ def upload(request):
     docs = Document.objects.all()
 
     # Render page using model parameters
-    return render(request, 'upload-file-template.html', {
+    return render(request, 'upload.html', {
         'docs': docs,
         'form': form
     })
+
+def _upload(request):
+    return render(request, 'upload.html')
+
+def choose(request):
+    return render(request, 'choose.html')
+
+def compute(request):
+    return render(request, 'compute.html')
