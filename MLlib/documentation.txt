@@ -1,0 +1,25 @@
+Functions:
+	get_column(path)
+	Argumnts:
+		path - A path to file whose column we want to find
+	Return value:
+		List of unicode strings. Each element is a name of a column.
+
+Class:
+	ModelBuilder
+		Methodes:
+			Constructor(self,path,target_col)
+			Arguments:
+				path - path to a file base on which we want to do our predictions
+				target_col - unicode string representing column we want to predict
+			
+			train_model
+			Arguments:
+				selected_model - object of Selected_model enum. As for now the only viable option is Selected_model.LINEAR_REGRESION
+			
+			predict
+			Arguments:
+				vec - vector with atributes, based on them we want to make our prediction
+				
+		Arguments:
+			is_valid - this should be checked after every call of constructor or train_model method. If 0 it means that error occured and class shouldn't be used.
