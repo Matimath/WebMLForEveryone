@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    
+
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- <link rel="icon" href="../../favicon.ico"> -->
@@ -14,18 +14,24 @@
 
     <title>Project Name - Upload</title>
 
-     <!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-		
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{% static 'ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
-    
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{% static 'ie10-viewport-bug-workaround.js' %}"></script>
 
@@ -37,38 +43,69 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+</head>
 
-  <body>
+<body>
 
-    <div class="container">
-	<!-- Nazwa projektu i nazwy zakładek są jeszcze do ustalenia i ewentualnej zmiany -->
-      <div class="masthead">
+<div class="container">
+    <!-- Nazwa projektu i nazwy zakładek są jeszcze do ustalenia i ewentualnej zmiany -->
+    <div class="masthead">
         <h3 class="text-muted">Project name</h3>
         <nav>
-          <ul class="nav nav-justified">
-            <li><a href="index.html">Home</a></li>
-            <li class="active"><a href="#">Upload</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
+            <ul class="nav nav-justified">
+                <li><a href="index.html">Home</a></li>
+                <li class="active"><a href="#">Upload</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
         </nav>
-      </div>
+    </div>
 
-		<ol class="breadcrumb">
-			<li><a href="{% url 'upload' %}">Upload</a></li>
-			<li><a href="{% url 'choose' %}">Choose</a></li>
-			<li class="active">Compute</li>
-		</ol>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'upload' %}">Upload</a></li>
+        <li><a href="/upload/choose/{{ id }}">Choose</a></li>
+        <li class="active">Compute</li>
+    </ol>
 
-		<button class="btn btn-info">Temporary button doing nothing</button>
+    <ul>
+        {% for col in columns %}
+            <li>
+                <p>{{ col }}</p>
+                <input id="predict-{{ forloop.counter }}" type="text">
+            </li>
+        {% endfor %}
+    </ul>
+    <div id="prediction">
+        <p id="prediction-text"></p>
+    </div>
+    <a id="predict" class="btn btn-warning" href="#">Select</a>
 
-      <!-- Site footer -->
-      <footer class="footer">
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#predict').click(function () {
+                var vec = [];
+                for (var i = 1; i <= {{ columns_length }}; ++i)
+                    vec.push($('#predict-' + i).val());
+                $.get('/upload/ajax/compute/', {
+                    'document_id': {{ id }},
+                    'column': '{{ column }}',
+                    'model': '{{ model }}',
+                    'vec': JSON.stringify(vec)
+                }, function (data) {
+                    alert("Chuj ci w dupę!!!");
+                    $('#prediction-text').text(data);
+                });
+            });
+        })
+    </script>
+
+
+    <!-- Site footer -->
+    <footer class="footer">
         <p>&copy; footer or something (may be deleted if unnecessary)</p>
-      </footer>
+    </footer>
 
-    </div> <!-- /container -->
-  </body>
+</div> <!-- /container -->
+</body>
 </html>
 
