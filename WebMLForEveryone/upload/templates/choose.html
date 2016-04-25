@@ -92,7 +92,6 @@
                     'document_id': {{ id }},
                     'column': option
                 }, function (data) {
-                    alert("Chuj ci w dupę!!!");
                     $('#model-type').text(data['Model_type']);
                     for (var i = 0; i < data['Available_models'].length; ++i)
                         $('#model-select-options').append(
