@@ -43,6 +43,16 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- For excel-like views -->
+    <link href="http://docs.handsontable.com/0.25.1/bower_components/handsontable/dist/handsontable.full.css" rel="stylesheet"></link>
+    <script src="http://docs.handsontable.com/0.25.1/bower_components/handsontable/dist/handsontable.full.js"></script>
+
+    <!-- For easy form submitting -->
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+
+    <!-- getCookie function -->
+    <script src="{% static 'getCookie.js' %}"></script>
 </head>
 
 <body>
@@ -67,36 +77,197 @@
         <li class="active">Compute</li>
     </ol>
 
-    <ul>
-        {% for col in columns %}
-            <li>
-                <p>{{ col }}</p>
-                <input id="predict-{{ forloop.counter }}" type="text">
-            </li>
-        {% endfor %}
-    </ul>
-    <div id="prediction">
-        <p id="prediction-text"></p>
+
+    <div id="alert-panel" class="row">
+        <div class="col-sm-12 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+            <div id="model-type" class="alert alert-success" style="width: 100%;">We are ready to make predictions. Choose your input method.</div>
+        </div>
     </div>
-    <a id="predict" class="btn btn-warning" href="#">Select</a>
+
+    <div id="upload-file" class="row">
+        <!--<h3><i>Upload file</i></h3>-->
+        <form id="upload-file-form" action="{% url 'ajax_upload_file' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="text" name="model_builder" value="{{ model_builder }}" style="display: none;">
+
+            <div class="col-sm-12 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+                <div class="input-group">
+                    <label class="input-group-btn">
+                        <span class="btn btn-primary">
+                            Browse&hellip; <input type="file" name="docfile" style="display: none;">
+                        </span>
+                    </label>
+                    <input type="text" class="form-control" readonly>
+                    <span class="input-group-btn">
+                        <!-- Loads excel file to front-end excel-like sheet -->
+                        <button id="upload-file-button" class="btn btn-default" type="submit">Load</button>
+                        <!-- Loads file to server, server makes predictions and lets you download the new file -->
+                        <button id="upload-file-then-save-button" class="btn btn-info">Instant prediction</button>
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <br/>
+
+    <div id="prediction-panel">
+        <div class="row">
+            <div class="col-sm-12 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+                <div id="excel-table"></div>
+            </div>
+        </div>
+        </br>
+        <div class="row">
+            <div class="col-sm-6 col-md-4 col-lg-4 col-sm-offset-3 col-md-offset-4 col-lg-offset-4">
+                <button id="add-rows-button" class="btn btn-default" style="width: 45%;">Add more rows</button>
+                <button id="predict-button" class="btn btn-info" style="width: 30%;">Predict</button>
+                <button id="save-button" class="btn btn-warning" style="width: 20%;">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invisible iframe for downloading documents -->
+    <iframe id="my_iframe" style="display:none;"></iframe>
 
     <script type="application/javascript">
         $(document).ready(function () {
-            $('#predict').click(function () {
-                var vec = [];
-                for (var i = 1; i <= {{ columns_length }}; ++i)
-                    vec.push($('#predict-' + i).val());
-                $.get('/upload/ajax/compute/', {
-                    'document_id': {{ id }},
-                    'column': '{{ column }}',
-                    'model': '{{ model }}',
-                    'vec': JSON.stringify(vec)
-                }, function (data) {
-                    $('#prediction-text').text(data);
+
+            var hotElement = document.getElementById('excel-table');
+
+            var get_columns = function() {
+                var columns = [];
+                var column;
+                {% for col in columns %}
+                    column = {
+                        data: '{{ col.data }}',
+                        type: '{{ col.type }}'
+                    };
+                    columns.push(column);
+                {% endfor %}
+                return columns;
+            };
+
+            var get_columns_names = function() {
+                var names = [];
+                {% for column in columns %}
+                    names.push('{{ column.name }}');
+                {% endfor %}
+                return names;
+            }
+
+            var min_nr_of_rows = 7;
+
+            var hotSettings = {
+                data: [],
+                columns: get_columns(),
+                stretchH: 'all',
+                autoWrapRow: true,
+                minRows: min_nr_of_rows,
+                height: 200,
+                rowHeaders: true,
+                colHeaders: get_columns_names()
+            };
+
+            var hot = new Handsontable(hotElement, hotSettings);
+
+            $('#upload-file-then-save-button').click(function() {
+                $('#upload-file-form').ajaxForm({
+                    url: '/upload/ajax/upload_predict_save/',
+                    dataType: 'json',
+                    success: function(data) {
+                        document.getElementById('my_iframe').src = data['url'];
+                    }
                 });
             });
+
+            $('#upload-file-button').click(function() {
+                $('#upload-file-form').ajaxForm({
+                    url: $('#upload-file-form').attr('action'),
+                    dataType: 'json',
+                    success: function(data) {
+                        var doc_id = data['document_id'];
+                        var rows = data['data'];
+
+                        // transform rows (array of arrays) to array of dicts
+                        var new_data = [];
+                        for (var i = 0; i < rows.length; ++i) {
+                            var row = rows[i];
+                            new_row = {};
+                            {% for col in columns %}
+                                new_row['{{ col.name }}'] = row[{{ forloop.counter }} - 1];
+                            {% endfor %}
+                            new_data.push(new_row);
+                        }
+
+                        hotSettings['minRows'] = new_data.length > min_nr_of_rows ? new_data.length : min_nr_of_rows;
+                        hotSettings['data'] = new_data;
+                        while(hotElement.firstChild)
+                            hotElement.removeChild(hotElement.firstChild);
+                        hot = new Handsontable(hotElement, hotSettings);
+                    }
+                });
+            });
+
+            $('#add-rows-button').click(function() {
+                add_more_rows(3);
+            });
+
+            $('#save-button').click(function() {
+                save_excel_table();
+            });
+
+            $('#predict-button').click(function() {
+                predict();
+            });
+
+            // adds more rows to excel table
+            var add_more_rows = function(nr_of_new_rows) {
+                var data = hotSettings['data'];
+                hotSettings['minRows'] = data.length + nr_of_new_rows;
+                while(hotElement.firstChild)
+                    hotElement.removeChild(hotElement.firstChild);
+                hot = new Handsontable(hotElement, hotSettings);
+            };
+
+            // saves excel table to file
+            var save_excel_table = function() {
+                var data = hot.getData();
+                var columns = get_columns_names();
+                $.post('/upload/ajax/save_to_excel/', {
+                    'columns': JSON.stringify(columns),
+                    'data': JSON.stringify(data),
+                    csrfmiddlewaretoken: getCookie('csrftoken')
+                })
+                .done(function(response_data) {
+                    document.getElementById('my_iframe').src = response_data['url'];
+                })
+                .fail(function(xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                });
+            };
+
+            // makes predictions (excel table as input)
+            var predict = function() {
+                var data = hot.getData(); // returns array of rows
+                $.get('/upload/ajax/predict/', {
+                    'model_builder': {{ model_builder }},
+                    'data': JSON.stringify(data)
+                    //csrfmiddlewaretoken: getCookie('csrftoken')
+                })
+                .done(function(data) {
+                    for (var i = 0; i < data['predictions'].length; ++i)
+                        hot.setDataAtCell(i, {{ column_index }}, data['predictions'][i]);
+                })
+                .fail(function(xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                });
+            };
         })
     </script>
+
+    <script src="{% static 'upload.js' %}"></script>
 
 
     <!-- Site footer -->

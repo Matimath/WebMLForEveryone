@@ -29,6 +29,12 @@
             integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
             crossorigin="anonymous"></script>
 
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{% static 'ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
 
@@ -67,43 +73,75 @@
         <li>Compute</li>
     </ol>
 
-    <div id="column-select">
-        <select id="column-select-options">
-            {% for col in columns %}
-                <option value="{{ col }}" name="{{ col }}">{{ col }}</option>
-            {% endfor %}
-        </select>
-        <a id="column-select-button" class="btn btn-warning" href="#">Select</a>
+    <div class="row">
+        <div id="column-select" class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+            <label>Select column:</label></br>
+            <select id="column-select-options" class="selectpicker" data-style="btn-default" data-width="78%">
+                {% for col in columns %}
+                    <option data-subtext="{{ col }}" value="{{ col }}" name="{{ col }}">{{ col }}</option>
+                {% endfor %}
+            </select>
+            <a id="column-select-button" class="btn btn-warning" href="#" style="width: 20%;">Select</a>
+        </div>
     </div>
+    </br>
 
     <div id="model-select">
-        <p id="model-type"></p>
-        <select id="model-select-options">
-        </select>
-        <a id="model-select-button" class="btn btn-warning" href="#">Select</a>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+                <div id="model-type" class="alert alert-success" style="width: 98%;"></div>
+            </div>
+        </div>
+        </br></br>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+                <label>Select model:</label></br>
+                <select id="model-select-options" class="selectpicker" data-style="btn-default" data-width="78%">
+                </select>
+                <a id="model-select-button" class="btn btn-warning" href="#" style="width: 20%;">Select</a>
+            </div>
+        </div>
     </div>
 
     <script type="application/javascript">
         $(document).ready(function () {
+            // name of model_builder pickle file
+            var model_builder = "";
+
             $('#model-select').hide();
             $('#column-select-button').click(function () {
                 var option = $('#column-select-options').val();
-                $.get('/upload/ajax/choose/', {
+                $.get('/upload/ajax/choose_model/', {
                     'document_id': {{ id }},
                     'column': option
-                }, function (data) {
+                })
+                .done(function (data) {
                     $('#model-type').text(data['Model_type']);
                     for (var i = 0; i < data['Available_models'].length; ++i)
                         $('#model-select-options').append(
-                                '<option val="' + data['Available_models'][i]['Name'] + '">'
-                                + data['Available_models'][i]['Name'] + '</option>');
+                                //'<option val="' + data['Available_models'][i]['Name'] + '">' +
+                                '<option>' + data['Available_models'][i]['Name'] + '</option>')
+                                .selectpicker('refresh');
+                    model_builder = data['model_builder'];
                     $('#model-select').show();
+                })
+                .fail(function(xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
                 });
             });
             $('#model-select-button').click(function () {
-                var column = $('#column-select-options').val();
                 var model = $('#model-select-options').val();
-                window.location = "/upload/compute/{{ id }}/" + column + "/" + model;
+
+                $.get('/upload/ajax/train_model/', {
+                    'model_builder': model_builder,
+                    'model': model
+                })
+                .done(function(data) {
+                    window.location = "/upload/compute/" + data['model_builder'] + "/";
+                })
+                .fail(function(xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                });
             });
         })
     </script>

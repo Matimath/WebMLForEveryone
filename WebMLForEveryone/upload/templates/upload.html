@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
           integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
             integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
@@ -66,27 +68,26 @@
     </ol>
 
     <!-- Upload file form -->
-    <div id="upload-file">
+    <div id="upload-file" class="row">
         <!--<h3><i>Upload file</i></h3>-->
         <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <!-- Form errors (if the are any) -->
-            <p>{{ form.non_field_errors }}</p>
 
-            <!-- Form label -->
-            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
-
-            <!-- File selector -->
-            <p>
-                {{ form.docfile.errors }}
-                {{ form.docfile }}
-            </p>
-
-            <!-- Upload button -->
-            <p><input class="btn btn-default" type="submit" value="Upload"/></p>
+            <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+                <div class="input-group">
+                    <label class="input-group-btn">
+                        <span class="btn btn-primary">
+                            Browse&hellip; <input type="file" name="docfile" style="display: none;">
+                        </span>
+                    </label>
+                    <input type="text" class="form-control" readonly>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Choose</button>
+                    </span>
+                </div>
+            </div>
         </form>
     </div>
-
 
     <!--<a class="btn btn-warning" href="choose.html">Temporary button redirecting to "choose"</a>-->
 
@@ -97,4 +98,7 @@
 
 </div> <!-- /container -->
 </body>
+
+<script src="{% static 'upload.js' %}"></script>
+
 </html>

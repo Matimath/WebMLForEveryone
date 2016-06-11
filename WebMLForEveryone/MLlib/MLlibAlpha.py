@@ -130,3 +130,16 @@ def get_columns(path):
     with pd.ExcelFile(path) as xls:
         data = pd.read_excel(xls, xls.sheet_names[0])
         return data.columns.values
+
+
+def get_excel_data(path):
+    with pd.ExcelFile(path) as xls:
+        data = pd.read_excel(xls)
+        return data.values.tolist()
+
+
+def save_to_excel(data, columns, path):
+    df = pd.DataFrame(data=data, columns=columns)
+    writer = pd.ExcelWriter(path)
+    df.to_excel(writer, 'Sheet1', index=False)
+    writer.save()
