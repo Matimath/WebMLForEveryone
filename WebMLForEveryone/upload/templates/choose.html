@@ -137,7 +137,7 @@
                     'model': model
                 })
                 .done(function(data) {
-                    window.location = "/upload/compute/" + data['model_builder'] + "/";
+                    window.location = "/upload/compute/" + data['model_builder'] + "/?id=" + {{ id }};
                 })
                 .fail(function(xhr, textStatus, errorThrown) {
                     alert(xhr.responseText);

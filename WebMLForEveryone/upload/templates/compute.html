@@ -253,6 +253,7 @@
                 var data = hot.getData(); // returns array of rows
                 $.get('/upload/ajax/predict/', {
                     'model_builder': {{ model_builder }},
+                    'column_index': {{ column_index }},
                     'data': JSON.stringify(data)
                     //csrfmiddlewaretoken: getCookie('csrftoken')
                 })

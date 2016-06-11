@@ -47,6 +47,8 @@ def choose(request, id):
 
 
 def compute(request, model_builder):
+    id = request.GET.get('id')
+
     mb = pickle.load(open(settings.MEDIA_ROOT + "/pickle/" + model_builder + ".mb", "rb"))
     path = mb.file_path
     column = mb.target_column
@@ -63,6 +65,7 @@ def compute(request, model_builder):
             'name': col
         })
     return render(request, 'compute.html', {
+        'id': id,
         'model_builder': model_builder,
         'columns': input_columns,
         'columns_length': len(input_columns),
@@ -102,14 +105,13 @@ def ajax_predict(request):
     model_builder = request.GET.get('model_builder')
     mb = pickle.load(open(settings.MEDIA_ROOT + "/pickle/" + model_builder + ".mb", "rb"))
     data = request.GET.get('data')
-    data = json.loads(data)             # data = [row1, row2, ...]  row = [cell1, cell2, ...]
+    data = json.loads(data)         # data = [row1, row2, ...]  row = [cell1, cell2, ...]
 
-    preds = []
-    for i, row in enumerate(data):
-        # TODO change to real predictions
-        preds.append('prediction ' + str(i + 1))
+    # Index of column to be predicted
+    column_index = int(request.GET.get('column_index'))
+
     response_data = {}
-    response_data['predictions'] = preds
+    response_data['predictions'] = mb.predict_from_data(data, column_index)
     return JsonResponse(response_data)
 
 
@@ -143,17 +145,11 @@ def ajax_upload_predict_save(request):
             model_builder = request.POST['model_builder']
             mb = pickle.load(open(settings.MEDIA_ROOT + "/pickle/" + model_builder + ".mb", "rb"))
 
-            # Extract to dataframe (or sth else; for computation)
-            # TODO
-
-            # Make predictions for each row
-            # TODO
-
-            # Save to file (media/predictions/...)
-            # TODO
+            name = current_milli_time() + ".xls"
+            mb.predict_from_file(doc.docfile.path, settings.MEDIA_ROOT + "/predictions/" + name)
 
             response_data = {}
-            response_data['url'] = 'url to file'
+            response_data['url'] = "/media/predictions/" + name
             return JsonResponse(response_data)
     raise Http404("No file to upload")
 
@@ -171,38 +167,3 @@ def ajax_save_to_excel(request):
     response_data['url'] = '/media/predictions/' + name
 
     return JsonResponse(response_data)
-
-
-
-# def ajax_predict_old(request):
-#     document_id = request.GET.get('document_id')
-#     column = request.GET.get('column')
-#     model = request.GET.get('model')
-#     doc = get_object_or_404(Document, id=document_id)
-#     mb = ModelBuilder(doc.docfile.path, column)
-#     mb.train_model(model)
-#     data = request.GET.get('data')
-#     data = json.loads(data)
-#     column_index = request.GET.get('column_index')
-#
-#     for row in data:
-#         for i, cell in enumerate(row):
-#             if str(i) == column_index:
-#                 del row[i]
-#     preds = []
-#     for row in data:
-#         # preds[i] = mb.predict(row)
-#         preds.append(5.78)
-#     data = {
-#         'predictions': preds
-#     }
-#     return JsonResponse(data)
-
-
-# def ajax_download_file(request):
-#     id = request.GET.get('id')
-#     doc = get_object_or_404(Document, id=id)
-#     response_data = {
-#         'url': doc.docfile.url
-#     }
-#     return JsonResponse(response_data)

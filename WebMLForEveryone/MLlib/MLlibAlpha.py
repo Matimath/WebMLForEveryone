@@ -123,7 +123,44 @@ class ModelBuilder:
         return result
 
     def predict(self, vec):
-        return self.get_model().predict([self.translate_vector(vec)])
+        return self.get_model().predict([self.translate_vector(vec)]).tolist()[0]
+
+    def predict_from_data(self, data, column_index):
+        predictions = []
+        for row in data:
+            del row[column_index]
+            empty_row = False
+            for i, cell in enumerate(row):
+                if cell == "null":
+                    empty_row = True
+                if self.value_type[i] == Data_type.NUMBER:
+                    try:
+                        row[i] = float(cell)
+                    except:
+                        empty_row = True
+            if not empty_row:
+                predictions.append(self.predict(row))
+            else:
+                predictions.append("")
+        return predictions
+
+    def predict_from_file(self, path_in, path_out):
+        data = get_excel_data(path_in)
+        columns = get_columns(path_in)
+
+        column_index = len(columns) - 1
+        for i, col in enumerate(columns):
+            if col == self.target_column:
+                column_index = i
+                break
+
+        for row in data:
+            del row[column_index]
+            # TODO validate row
+            pred = self.predict(row)
+            row.insert(column_index, pred)
+
+        save_to_excel(data, columns, path_out)
 
 
 def get_columns(path):
