@@ -47,6 +47,7 @@ class ModelBuilder:
     data = []
     model_type = 0
     model = 0
+    l = 0
 
     def clean(self):
         self.is_valid = 1
@@ -59,6 +60,7 @@ class ModelBuilder:
         self.data = []
         self.model_type = 0
         self.model = 0
+        self.l = 0
 
     def __init__(self, path, target_col):
         self.clean()
@@ -98,9 +100,9 @@ class ModelBuilder:
                             self.value_type.append(Data_type.IGNORE)
 
                     else:
-                        l = LabelEncoder()
-                        l.fit(data[column].values)
-                        self.Y.append(l.transform(data[column].values))
+                        self.l = LabelEncoder()
+                        self.l.fit(data[column].values)
+                        self.Y.append(self.l.transform(data[column].values))
                         self.model_type = Problem_type.CLASSIFICATION
 
             if self.model_type == 0:
@@ -139,7 +141,7 @@ class ModelBuilder:
         return result
 
     def predict(self, vec):
-        return self.get_model().predict([self.translate_vector(vec)]).tolist()[0]
+        return self.l.inverse_transform(self.get_model().predict([self.translate_vector(vec)]).tolist()[0])
 
     def predict_from_data(self, data, column_index):
         predictions = []
@@ -164,17 +166,21 @@ class ModelBuilder:
         data = get_excel_data(path_in)
         columns = get_columns(path_in)
 
-        column_index = len(columns) - 1
+        column_index = len(self.value_type)
         for i, col in enumerate(columns):
             if col == self.target_column:
                 column_index = i
                 break
 
         for row in data:
-            del row[column_index]
+            if column_index < len(columns):
+                del row[column_index]
             # TODO validate row
             pred = self.predict(row)
             row.insert(column_index, pred)
+
+        if column_index >= len(columns):
+            columns = numpy.append(columns, 'Column ' + str(column_index + 1))
 
         save_to_excel(data, columns, path_out)
 

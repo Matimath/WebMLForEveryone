@@ -10,25 +10,31 @@
     <meta name="author" content="">
     <!-- <link rel="icon" href="../../favicon.ico"> -->
 
-    <title>Project Name - Contact</title>
+    <title>Web ML For Everyone</title>
 
-     <!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-		
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="ie10-viewport-bug-workaround.css" rel="stylesheet">
-    
+    <link href="/static/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="ie10-viewport-bug-workaround.js"></script>
+    <script src="/static/ie10-viewport-bug-workaround.js"></script>
 
     <!-- Custom styles for this template -->
-    <link href="justified-nav.css" rel="stylesheet">
+    <link href="/static/justified-nav.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -42,20 +48,32 @@
     <div class="container">
 	<!-- Nazwa projektu i nazwy zakładek są jeszcze do ustalenia i ewentualnej zmiany -->
       <div class="masthead">
-        <h3 class="text-muted">Project name</h3>
+        <h3 class="text-muted">Web ML For Everyone</h3>
         <nav>
           <ul class="nav nav-justified">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="upload.html">Upload</a></li>
-            <li><a href="about.html">About</a></li>
+            <li><a href="/upload/index">Home</a></li>
+            <li><a href="{% url 'upload' %}">Upload</a></li>
+            <li><a href="/upload/about">About</a></li>
             <li class="active"><a href="#">Contact</a></li>
           </ul>
         </nav>
       </div>
 
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <br/>Contact us!<br/><br/>
+                    <a href="#">Bartłomiej Bancerek</a><br/>
+                    <a href="#">Michał Figlus</a><br/>
+                    <a href="#">Mateusz Macias</a><br/>
+                    <a href="#">Michał Preibisch</a>
+                </div>
+            </div>
+        </div>
+
       <!-- Site footer -->
       <footer class="footer">
-        <p>&copy; footer or something (may be deleted if unnecessary)</p>
+        <p>Web ML For Everyone&copy; 2016</p>
       </footer>
 
     </div> <!-- /container -->

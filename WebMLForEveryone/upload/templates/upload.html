@@ -12,7 +12,7 @@
 
     {% load staticfiles %}
 
-    <title>Project Name - Upload</title>
+    <title>Web ML For Everyone</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
@@ -50,13 +50,13 @@
 <div class="container">
     <!-- Nazwa projektu i nazwy zakładek są jeszcze do ustalenia i ewentualnej zmiany -->
     <div class="masthead">
-        <h3 class="text-muted">Project name</h3>
+        <h3 class="text-muted">Web ML For Everyone</h3>
         <nav>
             <ul class="nav nav-justified">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="/upload/index">Home</a></li>
                 <li class="active"><a href="#">Upload</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="/upload/about">About</a></li>
+                <li><a href="/upload/contact">Contact</a></li>
             </ul>
         </nav>
     </div>
@@ -66,6 +66,12 @@
         <li>Choose</a></li>
         <li>Compute</li>
     </ol>
+
+    <div id="alert-panel" class="row">
+        <div class="col-sm-12 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+            <div class="alert alert-success" style="width: 100%;">Upload XLS file containing training data.</div>
+        </div>
+    </div>
 
     <!-- Upload file form -->
     <div id="upload-file" class="row">
@@ -93,7 +99,7 @@
 
     <!-- Site footer -->
     <footer class="footer">
-        <p>&copy; footer or something (may be deleted if unnecessary)</p>
+        <p>Web ML For Everyone&copy; 2016</p>
     </footer>
 
 </div> <!-- /container -->

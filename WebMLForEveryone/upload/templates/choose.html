@@ -12,7 +12,7 @@
 
     {% load staticfiles %}
 
-    <title>Project Name - Upload</title>
+    <title>Web ML For Everyone</title>
 
     <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
 
@@ -56,49 +56,62 @@
 <div class="container">
     <!-- Nazwa projektu i nazwy zakładek są jeszcze do ustalenia i ewentualnej zmiany -->
     <div class="masthead">
-        <h3 class="text-muted">Project name</h3>
+        <h3 class="text-muted">Web ML For Everyone</h3>
         <nav>
             <ul class="nav nav-justified">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="/upload/index">Home</a></li>
                 <li class="active"><a href="#">Upload</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="/upload/about">About</a></li>
+                <li><a href="/upload/contact">Contact</a></li>
             </ul>
         </nav>
     </div>
 
     <ol class="breadcrumb">
         <li><a href="{% url 'upload' %}">Upload</a></li>
-        <li class="active">Choose</a></li>
+        <li class="active">Choose</li>
         <li>Compute</li>
     </ol>
 
-    <div class="row">
-        <div id="column-select" class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
-            <label>Select column:</label></br>
-            <select id="column-select-options" class="selectpicker" data-style="btn-default" data-width="78%">
-                {% for col in columns %}
-                    <option data-subtext="{{ col }}" value="{{ col }}" name="{{ col }}">{{ col }}</option>
-                {% endfor %}
-            </select>
-            <a id="column-select-button" class="btn btn-warning" href="#" style="width: 20%;">Select</a>
-        </div>
+    <div id="overlay" style="text-align: center;">
+        <img src="{% static 'squares.gif' %}">
     </div>
-    </br>
 
-    <div id="model-select">
-        <div class="row">
+    <div id="real-content">
+        <div id="alert-panel-1" class="row">
             <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
-                <div id="model-type" class="alert alert-success" style="width: 98%;"></div>
+                <div class="alert alert-success" style="width: 100%;">Choose column you want to predict.</div>
             </div>
         </div>
-        </br></br>
+
         <div class="row">
-            <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
-                <label>Select model:</label></br>
-                <select id="model-select-options" class="selectpicker" data-style="btn-default" data-width="78%">
+            <div id="column-select" class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+                <label>Select column:</label></br>
+                <select id="column-select-options" class="selectpicker" data-style="btn-default" data-width="78%">
+                    {% for col in columns %}
+                        <option data-subtext="{{ col }}" value="{{ col }}" name="{{ col }}">{{ col }}</option>
+                    {% endfor %}
                 </select>
-                <a id="model-select-button" class="btn btn-warning" href="#" style="width: 20%;">Select</a>
+                <a id="column-select-button" class="btn btn-warning" href="#" style="width: 20%;">Select</a>
+            </div>
+        </div>
+
+        </br>
+
+        <div id="model-select">
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+                    <div id="model-type" class="alert alert-success" style="width: 98%;">Now please select algorithm.</div>
+                </div>
+            </div>
+            </br></br>
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+                    <label>Select algorithm:</label></br>
+                    <select id="model-select-options" class="selectpicker" data-style="btn-default" data-width="78%">
+                    </select>
+                    <a id="model-select-button" class="btn btn-warning" href="#" style="width: 20%;">Select</a>
+                </div>
             </div>
         </div>
     </div>
@@ -108,22 +121,26 @@
             // name of model_builder pickle file
             var model_builder = "";
 
+            $('#overlay').hide();
             $('#model-select').hide();
+
             $('#column-select-button').click(function () {
                 var option = $('#column-select-options').val();
+                $('#model-select').fadeOut();
                 $.get('/upload/ajax/choose_model/', {
                     'document_id': {{ id }},
                     'column': option
                 })
                 .done(function (data) {
-                    $('#model-type').text(data['Model_type']);
+                    $('#alert-panel-1').hide();
+                    //$('#model-type').text(data['Model_type']);
                     for (var i = 0; i < data['Available_models'].length; ++i)
                         $('#model-select-options').append(
                                 //'<option val="' + data['Available_models'][i]['Name'] + '">' +
                                 '<option>' + data['Available_models'][i]['Name'] + '</option>')
                                 .selectpicker('refresh');
                     model_builder = data['model_builder'];
-                    $('#model-select').show();
+                    $('#model-select').fadeIn();
                 })
                 .fail(function(xhr, textStatus, errorThrown) {
                     alert(xhr.responseText);
@@ -131,6 +148,8 @@
             });
             $('#model-select-button').click(function () {
                 var model = $('#model-select-options').val();
+                $('#real-content').hide();
+                $('#overlay').fadeIn();
 
                 $.get('/upload/ajax/train_model/', {
                     'model_builder': model_builder,
@@ -148,7 +167,7 @@
 
     <!-- Site footer -->
     <footer class="footer">
-        <p>&copy; footer or something (may be deleted if unnecessary)</p>
+        <p>Web ML For Everyone&copy; 2016</p>
     </footer>
 
 </div> <!-- /container -->

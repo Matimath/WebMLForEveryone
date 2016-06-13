@@ -102,13 +102,13 @@ def ajax_train_model(request):
 
 
 def ajax_predict(request):
-    model_builder = request.GET.get('model_builder')
+    model_builder = request.POST['model_builder']
     mb = pickle.load(open(settings.MEDIA_ROOT + "/pickle/" + model_builder + ".mb", "rb"))
-    data = request.GET.get('data')
+    data = request.POST['data']
     data = json.loads(data)         # data = [row1, row2, ...]  row = [cell1, cell2, ...]
 
     # Index of column to be predicted
-    column_index = int(request.GET.get('column_index'))
+    column_index = int(request.POST['column_index'])
 
     response_data = {}
     response_data['predictions'] = mb.predict_from_data(data, column_index)
