@@ -25,9 +25,11 @@ class Selected_model(Enum):
 
 def is_number(row):
     for elem in row:
-        if not isinstance(elem, int) and not isinstance(elem, float):
+        try:
+            float(elem)
+            return 1
+        except:
             return 0
-    return 1
 
 
 def is_enum_proportion(enum_size, vector_size):
@@ -46,7 +48,20 @@ class ModelBuilder:
     model_type = 0
     model = 0
 
+    def clean(self):
+        self.is_valid = 1
+        self.file_path = ""
+        self.target_column = ""
+        self.value_type = []
+        self.translate_model = dict()
+        self.X = []
+        self.Y = []
+        self.data = []
+        self.model_type = 0
+        self.model = 0
+
     def __init__(self, path, target_col):
+        self.clean()
         try:
             self.file_path = path
             if path == "":
@@ -117,7 +132,8 @@ class ModelBuilder:
                 elif self.value_type[i] == Data_type.ENUM:
                     temp_list = self.translate_model[column].transform([vec[i]])
                     for elem in temp_list:
-                        result.append(elem)
+                        for el in elem:
+                            result.append(el)
                 i += 1
 
         return result
